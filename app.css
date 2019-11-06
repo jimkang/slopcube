@@ -226,6 +226,10 @@ footer {
   stroke: hsl(80, 50%, 50%);
 }
 
+.contour-edge {
+  stroke: hsl(300, 50%, 50%);
+}
+
 .centered-col {
   display: flex;
   flex-direction: column;
