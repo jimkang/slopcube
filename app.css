@@ -217,7 +217,12 @@ footer {
   fill: hsl(160, 50%, 50%);
   r: 2;
 }
-  
+
+.centered-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 
 @media all and (max-height: 568px) {
   body {
