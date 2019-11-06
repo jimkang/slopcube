@@ -4,10 +4,12 @@ var seedrandom = require('seedrandom');
 var wireControls = require('./dom/wire-controls');
 var RefreshScheduler = require('./refresh-scheduler');
 var slopFlow = require('./flows/slop-flow');
+var d3 = require('d3-selection');
 
 var routeState = RouteState({
   followRoute,
-  windowObject: window
+  windowObject: window,
+  propsToCoerceToBool: ['hideUI', 'debug']
 });
 
 (function go() {
@@ -15,7 +17,7 @@ var routeState = RouteState({
   routeState.routeFromHash();
 })();
 
-function followRoute({ seed, hideUI }) {
+function followRoute({ seed, hideUI, debug }) {
   var refreshScheduler = RefreshScheduler({ refresh: seedWithDate });
   wireControls({
     refresh: seedWithDate,
@@ -23,11 +25,8 @@ function followRoute({ seed, hideUI }) {
     unscheduleRefresh: refreshScheduler.unschedule
   });
 
-  if (hideUI === 'yes') {
-    document.body.classList.add('hide-ui');
-  } else {
-    document.body.classList.remove('hide-ui');
-  }
+  d3.select(document.body).classed('hide-ui', hideUI);
+  d3.select(document.body).classed('debug', debug);
 
   if (!seed) {
     seedWithDate();
