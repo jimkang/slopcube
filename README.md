@@ -1,7 +1,7 @@
-slop-cubes
+slopcube
 ==================
 
-[Slop Cubes](https://jimkang.com/slop-cubes)
+[Slopcube](https://jimkang.com/slopcube)
 
 Installation
 ------------
