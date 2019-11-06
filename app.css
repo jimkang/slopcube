@@ -1,0 +1,359 @@
+body {
+  font-size: 30px;
+  font-family: mr-eaves-sans, sans-serif;
+  color: #666;
+  background-color: #fff;
+  margin-bottom: 2em;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  flex-direction: column;
+}
+
+.dark {
+  color: #888;
+  background-color: black;
+  transition: 3s background-color;
+}
+
+.light {
+  background-color: white;
+  transition: 3s background-color;
+}
+
+a:link,a:visited {
+  color: #333;
+  font-weight: 700;
+}
+
+.dark a:link,a:visited {
+  color: white;
+}
+
+body > section {
+  width: 100%;
+}
+
+#board {
+  border: 1px solid #888;
+  border-radius: 8px;
+  margin-bottom: 1em;
+}
+
+.hide-ui #board{
+  border: none;
+  margin: 0;
+}
+
+p {
+  margin-top: 0;
+}
+
+.hidden {
+  opacity: 0;
+  transition: opacity 1s;
+  display: none;
+}
+
+.visible {
+  opacity: 1;
+  transition: opacity 2s;
+}
+
+.hide-ui .ui {
+  display: none;
+}
+
+#status-message {
+  background-color: #ffffee;
+  margin: 1em;
+  padding: 1em;
+}
+
+button {
+  text-transform: uppercase;
+  color: #444;
+  font-size: 1em;
+  cursor: pointer;
+  background-color: white;
+  padding-top: 0.5em;
+  border-radius: 1.2em;
+  border-width: 1px;
+  border-color: #aaa;
+  border-style: solid;
+  min-width: 44px;
+  /*! box-shadow: #444 0 0 4px; */
+  padding-bottom: 0.5em;
+  padding-left: 1em;
+  padding-right: 1em;
+}
+
+#orbit-paths path {
+  fill: none;
+}
+
+.click-target {
+  cursor: pointer;
+  fill: transparent;
+}
+
+.dark .click-target {
+  stroke: hsla(0, 0%, 100%, 0.25);
+}
+
+.light .click-target {
+  stroke: hsla(0, 0%, 0%, 0.25);
+}
+
+.dark .click-target[data-stability="2"] {
+  stroke: hsla(0, 0%, 100%, 0.5);
+}
+
+.light .click-target[data-stability="2"] {
+  stroke: hsla(0, 0%, 0%, 0.5);
+}
+
+.click-target[data-stability="1"] {
+  animation: rainbow-saturated 2s infinite;
+}
+
+@keyframes rainbow-saturated {
+  0% { stroke: hsla(319.06, 75%, 70.00%, 0.8) }
+  10% { stroke: hsla(351.76, 75%, 70.00%, 0.8) }
+  20% { stroke: hsla(32.00, 75%, 70.00%, 0.8) }
+  30% { stroke: hsla(55, 98.20%, 76.47%, 0.8) }
+  40% { stroke: hsla(120.00, 75%, 60.00%, 0.8) }
+  50% { stroke: hsla(166.92, 75%, 61.37%, 0.8) }
+  60% { stroke: hsla(189.88, 75%, 70.00%, 0.8) }
+  70% { stroke: hsla(192.47, 75%, 70.00%, 0.8) }
+  80% { stroke: hsla(202.12, 75%, 70.00%, 0.8) }
+  90% { stroke: hsla(300.00, 75%, 100%, 0.8) }
+}
+
+@keyframes rainbow-dimmer {
+  0% { stroke: hsla(120.00, 75%, 60.00%, 0.8) }
+  25% { stroke: hsla(166.92, 75%, 61.37%, 0.8) }
+  50% { stroke: hsla(189.88, 75%, 70.00%, 0.8) }
+  75% { stroke: hsla(192.47, 75%, 70.00%, 0.8) }
+}
+
+.rainbow-stop-0 {
+  stop-color: hsla(319.06, 75%, 50.00%, 0.8);
+}
+.rainbow-stop-1 {
+  stop-color: hsla(351.76, 75%, 50.00%, 0.8);
+}
+.rainbow-stop-2 {
+  stop-color: hsla(32.00, 75%, 50.00%, 0.8);
+}
+.rainbow-stop-3 {
+  stop-color: hsla(55, 98.20%, 56.47%, 0.8);
+}
+.rainbow-stop-4 {
+  stop-color: hsla(120.00, 75%, 40.00%, 0.8);
+}
+.rainbow-stop-5 {
+  stop-color: hsla(166.92, 75%, 41.37%, 0.8);
+}
+.rainbow-stop-6 {
+  stop-color: hsla(189.88, 75%, 50.00%, 0.8);
+}
+.rainbow-stop-7 {
+  stop-color: hsla(192.47, 75%, 50.00%, 0.8);
+}
+.rainbow-stop-8 {
+  stop-color: hsla(202.12, 75%, 50.00%, 0.8);
+}
+.rainbow-stop-9 {
+  stop-color: hsla(300.00, 75%, 86.08%, 0.8);
+}
+
+/*
+.rotation-group {
+  will-change: contents;
+}
+*/
+
+.rotation-group[data-speed="0"] {
+  animation: 6s linear spin infinite;
+}
+.rotation-group[data-speed="1"] {
+  animation: 4s linear spin infinite;
+}
+.rotation-group[data-speed="2"] {
+  animation: 3s linear spin infinite;
+}
+.rotation-group[data-speed="3"] {
+  animation: 1s linear spin infinite;
+}
+.rotation-group[data-speed="4"] {
+  animation: 0.5s linear spin infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(359deg);
+  }
+}
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.controls div {
+  margin-bottom: 1em;
+}
+
+.go-to-spinners-link,#spinventory-link {
+  cursor: pointer;
+  font-size: 2em;
+  color: #222;
+  text-decoration: underline;
+}
+
+.dark .go-to-spinners-link, .dark #spinventory-link {
+  color: white;
+}
+
+#spinventory {
+}
+
+#spinventory ul {
+  list-style-type: none;
+  padding-left: 0;
+  width: 100%;
+}
+
+#spinventory > ul {
+  margin-bottom: 2em;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+#spinventory .spinner-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 1em;
+  word-break: break-all;
+  max-width: 20em;
+
+  color: white;
+  background-color: #111;
+  padding: 1em;
+  margin-bottom: 1em;
+  margin-right: 0.5em;
+  margin-left: 0.5em;
+}
+
+#spinventory .spinner-item .description {
+  margin-top: 1em;
+  font-style: italic;
+  font-size: 1.2em;
+  text-align: center;
+  word-break: break-word;
+  margin-bottom: 1em;
+}
+
+.dark #spinventory .spinner-item {
+  color: #444;
+  background-color: white;
+}
+
+#spinventory .image-metadata {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#spinventory .image-name {
+  font-size: 2em;
+  font-weight: 700;
+}
+
+#spinventory .image-board {
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+.dark #spinventory .image-name {
+}
+
+#spinventory a:link, #spinventory a:visited {
+  color: white;
+}
+
+.dark #spinventory a:link, .dark #spinventory a:visited {
+  color: #333;
+}
+
+#spinventory h1 {
+  font-size: 3em;
+  font-weight: 400;
+  color: #333;
+  text-transform: uppercase;
+  margin-top: 0.25em;
+  text-align: center;
+}
+
+.dark #spinventory h1 {
+  color: white;
+}
+
+#empty-spinventory-message {
+  max-width: 20em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#clear-spinventory-button {
+  margin-bottom: 1em;
+}
+
+.item-prop-tree .label:after {
+  content: ":";
+}
+
+.item-prop-tree .label {
+  margin: 0.5em;
+  /*! background-color: #ff8; */
+  width: 8em;
+  text-align: right;
+  display: inline-block;
+  word-break: break-word;
+  margin-top: 0;
+  margin-bottom: 0;
+  max-width: 50%;
+}
+
+.item-prop-tree .value {
+}
+
+.tip {
+}
+
+.escaped-text {
+  text-anchor: middle;
+  fill: hsla(0, 0%, 90%, 0.6);
+  font-size: 10px;
+}
+
+footer {
+  margin-top: 1em;
+}
+
+@media all and (max-height: 568px) {
+  body {
+    font-size: 18px;
+  }
+}
+

@@ -1,0 +1,28 @@
+<html>
+  <head>
+    <title>Slop Cubes</title>
+    <link rel="stylesheet" href="https://use.typekit.net/lgz5hsk.css" />
+    <link rel="stylesheet" href="app.css" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  </head>
+  <body>
+    <pre id="status-message" class="hidden ui"></pre>
+
+    <section id="slop-cubes">
+      <svg width="100%" height="1000" viewBox="0 0 100 100" id="board"></svg>
+
+      <section class="controls ui">
+        <div>
+          <button id="refresh-button">Change!</button>
+        </div>
+        <div>
+          <input type="checkbox" id="autoupdate-checkbox" name="autoupdate" />
+          <label for="autoupdate">Automatically change every so often.</label>
+        </div>
+      </section>
+    </section>
+
+    <script src="index.js"></script>
+  </body>
+</html>
