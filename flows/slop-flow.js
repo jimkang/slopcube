@@ -5,11 +5,7 @@ var renderEdges = require('../dom/render-edges');
 const baseSliceAngle = (2 * Math.PI) / 6;
 const baseRadialEdgeLength = 25;
 
-function slopFlow({ probable, randomId }) {
-  var darkBG = probable.roll(3) > 0;
-  document.body.classList[darkBG ? 'add' : 'remove']('dark');
-  document.body.classList[darkBG ? 'remove' : 'add']('light');
-
+function slopFlow({ probable }) {
   var hexagonVertices = getHexagon();
 
   renderPoints({
@@ -28,12 +24,12 @@ function slopFlow({ probable, randomId }) {
   renderEdges({
     edges: cubeEdges.radialEdges,
     className: 'radial-edge',
-    rootSelector: '#debug-layer .cube-edges'
+    rootSelector: '#edge-layer .cube-edges'
   });
   renderEdges({
     edges: cubeEdges.cyclicEdges,
     className: 'cyclic-edge',
-    rootSelector: '#debug-layer .cube-edges'
+    rootSelector: '#edge-layer .cube-edges'
   });
 
   function getHexagon() {
@@ -80,20 +76,27 @@ function getComplementOfSliceAngle(angle) {
 function getCubeEdges({ center, edgeVertices }) {
   var radialEdges = [];
   for (var i = 0; i < edgeVertices.length; i += 2) {
-    radialEdges.push([center.slice(), edgeVertices[i].slice()]);
+    radialEdges.push({
+      id: `radial-edge-${i}`,
+      edge: [center.slice(), edgeVertices[i].slice()]
+    });
   }
   var cyclicEdges = edgeVertices.map(makeEdgeToPrev);
   return { radialEdges, cyclicEdges };
 }
 
 function makeEdgeToPrev(pt, i, points) {
-  var prev;
+  var prevIndex;
   if (i === 0) {
-    prev = points[points.length - 1];
+    prevIndex = points.length - 1;
   } else {
-    prev = points[i - 1];
+    prevIndex = i - 1;
   }
-  return [prev.slice(), pt.slice()];
+  var prev = points[prevIndex];
+  return {
+    id: `cyclic-edge-${prevIndex}-to-${i}`,
+    edge: [prev.slice(), pt.slice()]
+  };
 }
 
 module.exports = slopFlow;
