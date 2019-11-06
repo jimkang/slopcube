@@ -2,7 +2,6 @@ var handleError = require('handle-error-web');
 var RouteState = require('route-state');
 var seedrandom = require('seedrandom');
 var wireControls = require('./dom/wire-controls');
-var Probable = require('probable').createProbable;
 var RefreshScheduler = require('./refresh-scheduler');
 var slopFlow = require('./flows/slop-flow');
 
@@ -36,9 +35,8 @@ function followRoute({ seed, hideUI }) {
   }
 
   var random = seedrandom(seed);
-  var probable = Probable({ random });
 
-  slopFlow({ probable });
+  slopFlow({ random });
 }
 
 function seedWithDate() {

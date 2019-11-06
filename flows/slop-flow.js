@@ -2,13 +2,23 @@ var { range } = require('d3-array');
 var renderPoints = require('../dom/render-points');
 var renderEdges = require('../dom/render-edges');
 var math = require('basic-2d-math');
+var { Tablenest, d } = require('tablenest');
+var Probable = require('probable').createProbable;
 
 const baseSliceAngle = (2 * Math.PI) / 6;
 const baseRadialEdgeLength = 25;
 
-const contourDivisionsPerEdge = 10;
+var divisionsTableDef = {
+  root: [[10, d`d2+3`], [3, d`d20+5`], [2, d`d100+20`], [1, d`d200+100`]]
+};
 
-function slopFlow({ probable }) {
+function slopFlow({ random }) {
+  var probable = Probable({ random });
+  var tablenest = Tablenest({ random });
+
+  var divisionsTable = tablenest(divisionsTableDef);
+  let contourDivisionsPerEdge = divisionsTable.roll();
+
   var hexagonVertices = getHexagon();
 
   renderPoints({
@@ -96,7 +106,7 @@ function slopFlow({ probable }) {
   }
 
   function getContourEdges(edgeTrio) {
-    const contourPtsPerEdge = probable.roll(8) + 2;
+    const contourPtsPerEdge = probable.roll(contourDivisionsPerEdge - 1) + 1;
 
     // We need to make the edges go in the same direction.
     var centerEdge = edgeTrio[1];
