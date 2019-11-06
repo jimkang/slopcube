@@ -1,7 +1,15 @@
 var d3 = require('d3-selection');
 var accessor = require('accessor');
+require('d3-transition');
+var ease = require('d3-ease');
 
-function renderEdges({ edges, className, rootSelector, colorAccessor }) {
+function renderEdges({
+  edges,
+  className,
+  rootSelector,
+  colorAccessor,
+  tweenLengthMS = 1000
+}) {
   var edgesRoot = d3.select(rootSelector);
   var edgesSel = edgesRoot.selectAll('.' + className).data(edges, accessor());
   edgesSel.exit().remove();
@@ -13,6 +21,9 @@ function renderEdges({ edges, className, rootSelector, colorAccessor }) {
   var updateEdges = newEdges.merge(edgesSel);
   updateEdges
     .attr('id', accessor())
+    .transition()
+    .duration(tweenLengthMS)
+    .ease(ease.easeLinear)
     .attr('x1', accessor({ path: 'edge/0/0' }))
     .attr('y1', accessor({ path: 'edge/0/1' }))
     .attr('x2', accessor({ path: 'edge/1/0' }))

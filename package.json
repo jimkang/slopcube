@@ -31,6 +31,7 @@
     "accessor": "^3.0.0",
     "basic-2d-math": "^1.0.0",
     "d3-array": "^2.0.3",
+    "d3-ease": "^1.0.5",
     "d3-hierarchy": "^1.1.8",
     "d3-scale-chromatic": "^1.3.3",
     "d3-selection": "^1.3.2",
