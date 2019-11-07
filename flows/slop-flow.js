@@ -68,7 +68,8 @@ function slopFlow({ random }) {
       .concat(radialEdge4ContourEdges)
       .flat(),
     className: 'contour-edge',
-    rootSelector: '#edge-layer .contour-edges'
+    rootSelector: '#edge-layer .contour-edges',
+    probable
   });
 
   function getHexagon() {
