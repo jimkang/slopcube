@@ -9,7 +9,8 @@ function renderEdges({
   rootSelector,
   colorAccessor,
   tweenLengthMS = 1000,
-  probable
+  probable,
+  center
 }) {
   var edgesRoot = d3.select(rootSelector);
   var edgesSel = edgesRoot.selectAll('.' + className).data(edges, accessor());
@@ -46,6 +47,11 @@ function renderEdges({
     var existingEdges = d3.selectAll(`[id^="${prefix}"]`).data();
     if (existingEdges.length < 1) {
       console.log('No near edge for prefix', prefix);
+      copyEdgeSel
+        .attr('x1', center[0])
+        .attr('y1', center[1])
+        .attr('x2', center[0])
+        .attr('y2', center[1]);
       return;
     }
 

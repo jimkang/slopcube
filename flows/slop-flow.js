@@ -38,12 +38,14 @@ function slopFlow({ random }) {
   renderEdges({
     edges: cubeEdges.radialEdges,
     className: 'radial-edge',
-    rootSelector: '#edge-layer .cube-edges'
+    rootSelector: '#edge-layer .cube-edges',
+    center: hexagonVertices.center
   });
   renderEdges({
     edges: cubeEdges.cyclicEdges,
     className: 'cyclic-edge',
-    rootSelector: '#edge-layer .cube-edges'
+    rootSelector: '#edge-layer .cube-edges',
+    center: hexagonVertices.center
   });
 
   var radialEdge0ContourEdges = getContourEdges([
@@ -69,7 +71,8 @@ function slopFlow({ random }) {
       .flat(),
     className: 'contour-edge',
     rootSelector: '#edge-layer .contour-edges',
-    probable
+    probable,
+    center: hexagonVertices.center
   });
 
   function getHexagon() {
