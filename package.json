@@ -24,7 +24,7 @@
     "babel-preset-es2015": "^6.24.1",
     "babelify": "^7.3.0",
     "browserify": "^14.5.0",
-    "uglify-es": "^3.1.9"
+    "uglify-es": "^3.3.9"
   },
   "dependencies": {
     "@jimkang/randomid": "^1.0.0",
@@ -50,6 +50,6 @@
     "route-state": "^2.0.5",
     "seedrandom": "^3.0.1",
     "standard-bail": "^2.0.1",
-    "tablenest": "^3.0.7"
+    "tablenest": "^4.0.0"
   }
 }

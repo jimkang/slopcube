@@ -16,8 +16,9 @@ function slopFlow({ random }) {
   var probable = Probable({ random });
   var tablenest = Tablenest({ random });
 
-  var divisionsTable = tablenest(divisionsTableDef);
-  let contourDivisionsPerEdge = divisionsTable.roll();
+  var rollDivisions = tablenest(divisionsTableDef);
+  let contourDivisionsPerEdge = rollDivisions();
+  console.log('contourDivisionsPerEdge', contourDivisionsPerEdge);
 
   var hexagonVertices = getHexagon();
 
