@@ -239,8 +239,12 @@ footer {
   align-items: center;
 }
 
-.debug #debug-layer {
+#debug-layer {
   display: none;
+}
+
+.debug #debug-layer {
+  display: initial;
 }
 
 @media all and (max-height: 568px) {
