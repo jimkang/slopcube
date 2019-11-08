@@ -4,6 +4,7 @@ var renderEdges = require('../dom/render-edges');
 var math = require('basic-2d-math');
 var { Tablenest, d } = require('tablenest');
 var Probable = require('probable').createProbable;
+var getLinearGradient = require('../dom/get-linear-gradient');
 
 const baseSliceAngle = (2 * Math.PI) / 6;
 const baseRadialEdgeLength = 25;
@@ -23,14 +24,16 @@ function slopFlow({ random }) {
   var hexagonVertices = getHexagon();
 
   renderPoints({
-    points: hexagonVertices.edgeVertices,
+    points: hexagonVertices.edgeVertices.map(v => v.pt),
     className: 'hexagon-vertex',
-    rootSelector: '#debug-layer .hexagon-points'
+    rootSelector: '#debug-layer .hexagon-points',
+    colorAccessor: v => v.color
   });
   renderPoints({
-    points: [hexagonVertices.center],
+    points: [hexagonVertices.center.pt],
     className: 'hexagon-center',
-    rootSelector: '#debug-layer .hexagon-points'
+    rootSelector: '#debug-layer .hexagon-points',
+    colorAccessor: hexagonVertices.center.color
   });
 
   var cubeEdges = getCubeEdges(hexagonVertices);
@@ -39,13 +42,15 @@ function slopFlow({ random }) {
     edges: cubeEdges.radialEdges,
     className: 'radial-edge',
     rootSelector: '#edge-layer .cube-edges',
-    center: hexagonVertices.center
+    center: hexagonVertices.center,
+    colorAccessor: getColor
   });
   renderEdges({
     edges: cubeEdges.cyclicEdges,
     className: 'cyclic-edge',
     rootSelector: '#edge-layer .cube-edges',
-    center: hexagonVertices.center
+    center: hexagonVertices.center,
+    colorAccessor: getColor
   });
 
   var radialEdge0ContourEdges = getContourEdges([
@@ -72,11 +77,12 @@ function slopFlow({ random }) {
     className: 'contour-edge',
     rootSelector: '#edge-layer .contour-edges',
     probable,
-    center: hexagonVertices.center
+    center: hexagonVertices.center,
+    colorAccessor: getColor
   });
 
   function getHexagon() {
-    var center = [50, 50];
+    var center = { pt: [50, 50], color: getRandomColor() };
     var edgeVertices = [];
     var sliceAngles = range(3).map(getSliceAngle);
     sliceAngles = sliceAngles.concat(
@@ -90,7 +96,10 @@ function slopFlow({ random }) {
       angle += sliceAngles[i];
       const x = radialEdgeLengths[i] * Math.cos(angle);
       const y = radialEdgeLengths[i] * Math.sin(angle);
-      edgeVertices.push([center[0] + x, center[1] + y]);
+      edgeVertices.push({
+        pt: [center.pt[0] + x, center.pt[1] + y],
+        color: getRandomColor()
+      });
     }
     return { center, edgeVertices };
   }
@@ -139,7 +148,7 @@ function slopFlow({ random }) {
       })
     ];
 
-    function getContourPointsAlongEdge({ edge }) {
+    function getContourPointsAlongEdge({ edge, ptA, ptB }) {
       var pts = [];
       var contourIndexes = probable
         .sample(range(contourDivisionsPerEdge), contourPtsPerEdge)
@@ -151,7 +160,11 @@ function slopFlow({ random }) {
         const edgeProportion = contourIndex / contourDivisionsPerEdge;
         const ptX = edge[0][0] + xDelta * edgeProportion;
         const ptY = edge[0][1] + yDelta * edgeProportion;
-        pts.push({ contourIndex, pt: [ptX, ptY] });
+        pts.push({
+          contourIndex,
+          pt: [ptX, ptY],
+          color: avgColors(ptA.color, ptB.color)
+        });
       }
       return pts;
     }
@@ -171,7 +184,9 @@ function slopFlow({ random }) {
         let ptB = ptGroupB[i];
         edges.push({
           id: `${idBase}-indexes-${ptA.contourIndex}-${ptB.contourIndex}`,
-          edge: [ptA.pt.slice(), ptB.pt.slice()]
+          edge: [ptA.pt.slice(), ptB.pt.slice()],
+          ptA,
+          ptB
         });
       }
 
@@ -184,14 +199,16 @@ function slopFlow({ random }) {
     for (var i = 0; i < edgeVertices.length; i += 2) {
       radialEdges.push({
         id: `radial-edge-${i}`,
-        edge: [center.slice(), edgeVertices[i].slice()]
+        edge: [center.pt.slice(), edgeVertices[i].pt.slice()],
+        ptA: center,
+        ptB: edgeVertices[i]
       });
     }
     var cyclicEdges = edgeVertices.map(makeEdgeToPrev);
     return { radialEdges, cyclicEdges };
   }
 
-  function makeEdgeToPrev(pt, i, points) {
+  function makeEdgeToPrev(point, i, points) {
     var prevIndex;
     if (i === 0) {
       prevIndex = points.length - 1;
@@ -201,7 +218,9 @@ function slopFlow({ random }) {
     var prev = points[prevIndex];
     return {
       id: `cyclic-edge-${prevIndex}-to-${i}`,
-      edge: [prev.slice(), pt.slice()]
+      edge: [prev.pt.slice(), point.pt.slice()],
+      ptA: prev,
+      ptB: point
     };
   }
 
@@ -217,6 +236,24 @@ function slopFlow({ random }) {
     return 1;
   }
   */
+
+  // TODO: Make this a mode
+  function getColor({ id, edge, ptA, ptB }) {
+    //return `hsl(${ptA.color.h}, ${ptA.color.s}%, ${ptA.color.l}%)`;
+    return `url('#${getLinearGradient({
+      colorA: ptA.color,
+      colorB: ptB.color
+    })}')`;
+  }
+
+  // TODO: Some kinda scheme.
+  function getRandomColor() {
+    return {
+      h: probable.roll(360),
+      s: probable.roll(100),
+      l: probable.roll(100)
+    };
+  }
 }
 
 function getComplementOfSliceAngle(angle) {
@@ -242,6 +279,11 @@ function matchDirection({ direction, edge }) {
 
 function invert(x) {
   return x * -1;
+}
+
+// TODO: Weights
+function avgColors(a, b) {
+  return { h: (a.h + b.h) / 2, s: (a.s + b.s) / 2, l: (a.l + b.l) / 2 };
 }
 
 module.exports = slopFlow;

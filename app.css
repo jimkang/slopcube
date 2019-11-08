@@ -222,17 +222,14 @@ footer {
 }
 
 .radial-edge {
-  stroke: hsl(60, 50%, 50%);
   stroke-width: 0.2;
 }
 
 .cyclic-edge {
-  stroke: hsl(80, 50%, 50%);
   stroke-width: 0.2;
 }
 
 .contour-edge {
-  stroke: hsl(80, 50%, 50%);
   stroke-width: 0.2;
 }
 
