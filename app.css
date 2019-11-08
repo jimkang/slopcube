@@ -35,9 +35,12 @@ body > section {
 }
 
 #board {
-  border: 1px solid #888;
   border-radius: 8px;
   margin-bottom: 1em;
+}
+
+.debug #board {
+  border: 1px solid #888;
 }
 
 .hide-ui #board{
