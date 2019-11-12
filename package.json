@@ -43,6 +43,7 @@
     "lodash.flatten": "^4.4.0",
     "lodash.omit": "^4.5.0",
     "lodash.pick": "^4.4.0",
+    "lodash.uniq": "^4.5.0",
     "object-path-exists": "^1.0.0",
     "one-listener-per-element": "^1.0.0",
     "probable": "^2.1.4",

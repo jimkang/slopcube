@@ -4,7 +4,9 @@ var renderEdges = require('../dom/render-edges');
 var math = require('basic-2d-math');
 var { Tablenest, d } = require('tablenest');
 var Probable = require('probable').createProbable;
-var getLinearGradient = require('../dom/get-linear-gradient');
+var { getLinearGradientId } = require('../linear-gradient-id');
+var renderLinearGradientDefs = require('../dom/render-linear-gradient-defs');
+var uniq = require('lodash.uniq');
 
 const baseSliceAngle = (2 * Math.PI) / 6;
 const baseRadialEdgeLength = 25;
@@ -38,21 +40,6 @@ function slopFlow({ random }) {
 
   var cubeEdges = getCubeEdges(hexagonVertices);
 
-  renderEdges({
-    edges: cubeEdges.radialEdges,
-    className: 'radial-edge',
-    rootSelector: '#edge-layer .cube-edges',
-    center: hexagonVertices.center,
-    colorAccessor: getColor
-  });
-  renderEdges({
-    edges: cubeEdges.cyclicEdges,
-    className: 'cyclic-edge',
-    rootSelector: '#edge-layer .cube-edges',
-    center: hexagonVertices.center,
-    colorAccessor: getColor
-  });
-
   var radialEdge0ContourEdges = getContourEdges([
     cubeEdges.cyclicEdges[2],
     cubeEdges.radialEdges[0],
@@ -68,12 +55,38 @@ function slopFlow({ random }) {
     cubeEdges.radialEdges[2],
     cubeEdges.cyclicEdges[3]
   ]);
+  var contourEdges = radialEdge0ContourEdges
+    .concat(radialEdge2ContourEdges)
+    .concat(radialEdge4ContourEdges)
+    .flat();
+
+  var activeLinearGradientIds = uniq(
+    cubeEdges.radialEdges
+      .concat(cubeEdges.cyclicEdges)
+      .concat(contourEdges)
+      .map(getLinearGradientId)
+  );
+
+  // The linear gradient defs referenced by the edges
+  // must exist before they are referenced.
+  renderLinearGradientDefs(activeLinearGradientIds);
 
   renderEdges({
-    edges: radialEdge0ContourEdges
-      .concat(radialEdge2ContourEdges)
-      .concat(radialEdge4ContourEdges)
-      .flat(),
+    edges: cubeEdges.radialEdges,
+    className: 'radial-edge',
+    rootSelector: '#edge-layer .cube-edges',
+    center: hexagonVertices.center,
+    colorAccessor: getColor
+  });
+  renderEdges({
+    edges: cubeEdges.cyclicEdges,
+    className: 'cyclic-edge',
+    rootSelector: '#edge-layer .cube-edges',
+    center: hexagonVertices.center,
+    colorAccessor: getColor
+  });
+  renderEdges({
+    edges: contourEdges,
     className: 'contour-edge',
     rootSelector: '#edge-layer .contour-edges',
     probable,
@@ -240,10 +253,7 @@ function slopFlow({ random }) {
   // TODO: Make this a mode
   function getColor({ id, edge, ptA, ptB }) {
     //return `hsl(${ptA.color.h}, ${ptA.color.s}%, ${ptA.color.l}%)`;
-    return `url('#${getLinearGradient({
-      colorA: ptA.color,
-      colorB: ptB.color
-    })}')`;
+    return `url('#${getLinearGradientId({ ptA, ptB })}')`;
   }
 
   // TODO: Some kinda scheme.
