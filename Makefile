@@ -15,11 +15,10 @@ deploy:
 run:
 	wzrd app.js:index.js -- \
 		-d \
-		$(PLUGIN_SWITCH) \
-		$(TRANSFORM_SWITCH)
+		$(PLUGIN_SWITCH) 
 
 build:
-	$(BROWSERIFY) $(PLUGIN_SWITCH) $(TRANSFORM_SWITCH) app.js | $(UGLIFY) -c -m -o index.js
+	$(BROWSERIFY) $(PLUGIN_SWITCH) app.js | $(UGLIFY) -c -m -o index.js
 	#$(BROWSERIFY) $(PLUGIN_SWITCH) $(TRANSFORM_SWITCH) app.js > index.js
 
 prettier:

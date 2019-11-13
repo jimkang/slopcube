@@ -7,6 +7,7 @@ var Probable = require('probable').createProbable;
 var { getLinearGradientId } = require('../linear-gradient-id');
 var renderLinearGradientDefs = require('../dom/render-linear-gradient-defs');
 var uniq = require('lodash.uniq');
+var { HSLColor, Vertex } = require('../types');
 
 const baseSliceAngle = (2 * Math.PI) / 6;
 const baseRadialEdgeLength = 25;
