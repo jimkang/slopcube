@@ -284,7 +284,7 @@ function slopFlow({ random }) {
     return {
       h: probable.roll(360),
       c: probable.roll(100),
-      l: probable.roll(100),
+      l: probable.roll(80) + 20,
       opacity: 1.0
     };
   }

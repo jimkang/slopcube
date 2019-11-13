@@ -10,6 +10,8 @@ function renderLinearGradientDefs(defObjects) {
     .data(defObjects, accessor());
   gradientDefs.exit().remove();
   var newGradientDefs = gradientDefs.enter().append('linearGradient');
+
+  //.attr('gradientUnits', 'objectBoundingBox');
   newGradientDefs
     .append('stop')
     .classed('begin-stop', true)
@@ -20,17 +22,22 @@ function renderLinearGradientDefs(defObjects) {
     .attr('offset', '100%');
 
   var activeGradientDefs = newGradientDefs.merge(gradientDefs);
-  activeGradientDefs.attr('id', accessor());
+  activeGradientDefs
+    .attr('id', accessor())
+    .attr('x1', accessor('x1'))
+    .attr('x2', accessor('x2'))
+    .attr('y1', accessor('y1'))
+    .attr('y2', accessor('y2'));
   activeGradientDefs.select('.begin-stop').attr('stop-color', getBeginColor);
   activeGradientDefs.select('.end-stop').attr('stop-color', getEndColor);
 }
 
-function getBeginColor({ begin }) {
-  return parseHCLColorToRGBString(begin);
+function getBeginColor({ beginColor }) {
+  return parseHCLColorToRGBString(beginColor);
 }
 
-function getEndColor({ end }) {
-  return parseHCLColorToRGBString(end);
+function getEndColor({ endColor }) {
+  return parseHCLColorToRGBString(endColor);
 }
 
 module.exports = renderLinearGradientDefs;

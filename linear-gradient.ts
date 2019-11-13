@@ -1,13 +1,26 @@
-import { Spot, HCLColor } from './types';
+import { LinearGradient, Spot, HCLColor } from './types';
 var { formatHsl, hcl } = require('d3-color');
 
 var allDotsRegex = /\./g;
 
-function getLinearGradientObject({ ptA, ptB }: { ptA: Spot; ptB: Spot }) {
+function getLinearGradientObject({
+  ptA,
+  ptB
+}: {
+  ptA: Spot;
+  ptB: Spot;
+}): LinearGradient {
+  const aIsGreaterHorizontally = ptA.pt[0] > ptB.pt[0];
+  const aIsGreaterVertically = ptA.pt[1] > ptB.pt[1];
+
   return {
     id: getLinearGradientId({ ptA, ptB }),
-    begin: ptA.color,
-    end: ptB.color
+    x1: aIsGreaterHorizontally ? '100%' : '0%',
+    x2: aIsGreaterHorizontally ? '0%' : '100%',
+    y1: aIsGreaterVertically ? '100%' : '0%',
+    y2: aIsGreaterVertically ? '0%' : '100%',
+    beginColor: ptA.color,
+    endColor: ptB.color
   };
 }
 

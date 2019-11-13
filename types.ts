@@ -18,6 +18,16 @@ export interface Line {
   ptB: Spot;
 }
 
+export interface LinearGradient {
+  id: string;
+  x1: string;
+  x2: string;
+  y1: string;
+  y2: string;
+  beginColor: HCLColor;
+  endColor: HCLColor;
+}
+
 /*
 Avoid:
 > var a = { one: [1, 0] }
