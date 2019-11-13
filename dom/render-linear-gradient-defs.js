@@ -9,9 +9,9 @@ function renderLinearGradientDefs(defObjects) {
     .selectAll('linearGradient')
     .data(defObjects, accessor());
   gradientDefs.exit().remove();
-  var newGradientDefs = gradientDefs.enter().append('linearGradient');
-
-  //.attr('gradientUnits', 'objectBoundingBox');
+  var newGradientDefs = gradientDefs
+    .enter()
+    .append('linearGradient');
   newGradientDefs
     .append('stop')
     .classed('begin-stop', true)
