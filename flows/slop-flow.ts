@@ -4,11 +4,16 @@ var renderLines = require('../dom/render-edges');
 var math = require('basic-2d-math');
 var { Tablenest, d } = require('tablenest');
 var Probable = require('probable').createProbable;
-var { getLinearGradientId } = require('../linear-gradient-id');
+var {
+  getLinearGradientObject,
+  getLinearGradientId
+} = require('../linear-gradient');
 var renderLinearGradientDefs = require('../dom/render-linear-gradient-defs');
-var uniq = require('lodash.uniq');
 var flatten = require('lodash.flatten');
-import { HSLColor, Spot, Line, copyPt } from '../types';
+var interpolateHCL = require('../interpolate-hcl');
+var { hsl } = require('d3-color');
+
+import { HCLColor, Spot, Line, copyPt } from '../types';
 
 const baseSliceAngle = (2 * Math.PI) / 6;
 const baseRadialLineLength = 25;
@@ -63,16 +68,15 @@ function slopFlow({ random }) {
       .concat(radialLine4ContourLines)
   );
 
-  var activeLinearGradientIds = uniq(
-    cubeLines.radialLines
-      .concat(cubeLines.cyclicLines)
-      .concat(contourLines)
-      .map(getLinearGradientId)
-  );
+  var activeLinearGradients = cubeLines.radialLines
+    .concat(cubeLines.cyclicLines)
+    .concat(contourLines)
+    .map(getLinearGradientObject)
+    .reduce(lgObjectIsUnique, []);
 
   // The linear gradient defs referenced by the edges
   // must exist before they are referenced.
-  renderLinearGradientDefs(activeLinearGradientIds);
+  renderLinearGradientDefs(activeLinearGradients);
 
   renderLines({
     edges: cubeLines.radialLines,
@@ -184,7 +188,11 @@ function slopFlow({ random }) {
         pts.push({
           contourIndex,
           pt: [ptX, ptY],
-          color: avgColors(ptA.color, ptB.color)
+          color: getColorBetweenPoints({
+            proportion: coordsProportion,
+            ptA,
+            ptB
+          })
         });
       }
       return pts;
@@ -272,11 +280,12 @@ function slopFlow({ random }) {
   }
 
   // TODO: Some kinda scheme.
-  function getRandomColor() {
+  function getRandomColor(): HCLColor {
     return {
       h: probable.roll(360),
-      s: probable.roll(100),
-      l: probable.roll(100)
+      c: probable.roll(100),
+      l: probable.roll(100),
+      opacity: 1.0
     };
   }
 }
@@ -311,9 +320,28 @@ function invert(x) {
   return x * -1;
 }
 
-// TODO: Weights
-function avgColors(a, b) {
-  return { h: (a.h + b.h) / 2, s: (a.s + b.s) / 2, l: (a.l + b.l) / 2 };
+function getColorBetweenPoints({
+  ptA,
+  ptB,
+  proportion
+}: {
+  ptA: Spot;
+  ptB: Spot;
+  proportion: number;
+}) {
+  var color = interpolateHCL(ptA.color, ptB.color)(proportion);
+  return color;
+}
+
+function lgObjectIsUnique(collected, lg) {
+  if (!collected.find(matchesId)) {
+    collected.push(lg);
+  }
+  return collected;
+
+  function matchesId(collectedLg) {
+    return collectedLg.id === lg.id;
+  }
 }
 
 module.exports = slopFlow;

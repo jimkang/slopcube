@@ -1,13 +1,13 @@
 var d3 = require('d3-selection');
 var accessor = require('accessor');
-var { parseLinearGradientIdToHSLString } = require('../linear-gradient-id');
+var { parseHCLColorToRGBString } = require('../linear-gradient');
 
 var defs = d3.select('defs');
 
-function renderLinearGradientDefs(defIds) {
+function renderLinearGradientDefs(defObjects) {
   var gradientDefs = defs
     .selectAll('linearGradient')
-    .data(defIds, accessor('identity'));
+    .data(defObjects, accessor());
   gradientDefs.exit().remove();
   var newGradientDefs = gradientDefs.enter().append('linearGradient');
   newGradientDefs
@@ -20,19 +20,17 @@ function renderLinearGradientDefs(defIds) {
     .attr('offset', '100%');
 
   var activeGradientDefs = newGradientDefs.merge(gradientDefs);
-  activeGradientDefs.attr('id', accessor('identity'));
-
+  activeGradientDefs.attr('id', accessor());
   activeGradientDefs.select('.begin-stop').attr('stop-color', getBeginColor);
-
   activeGradientDefs.select('.end-stop').attr('stop-color', getEndColor);
 }
 
-function getBeginColor(id) {
-  return parseLinearGradientIdToHSLString(id)[0];
+function getBeginColor({ begin }) {
+  return parseHCLColorToRGBString(begin);
 }
 
-function getEndColor(id) {
-  return parseLinearGradientIdToHSLString(id)[1];
+function getEndColor({ end }) {
+  return parseHCLColorToRGBString(end);
 }
 
 module.exports = renderLinearGradientDefs;
