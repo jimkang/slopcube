@@ -16,7 +16,7 @@ var { hsl } = require('d3-color');
 import { HCLColor, Spot, Line, copyPt } from '../types';
 
 const baseSliceAngle = (2 * Math.PI) / 6;
-const baseRadialLineLength = 25;
+const baseRadialLineLength = 35;
 
 var divisionsTableDef = {
   root: [[10, d`d2+3`], [3, d`d20+5`], [2, d`d100+20`], [1, d`d200+100`]]
@@ -284,7 +284,7 @@ function slopFlow({ random }) {
     return {
       h: probable.roll(360),
       c: probable.roll(100),
-      l: probable.roll(80) + 20,
+      l: probable.roll(70) + 30,
       opacity: 1.0
     };
   }

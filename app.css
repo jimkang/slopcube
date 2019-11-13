@@ -223,17 +223,17 @@ footer {
 
 .radial-edge {
   stroke-width: 0.2;
-  stroke-linecap: round;
+  stroke-linecap: miter;
 }
 
 .cyclic-edge {
   stroke-width: 0.2;
-  stroke-linecap: round;
+  stroke-linecap: miter;
 }
 
 .contour-edge {
   stroke-width: 0.2;
-  stroke-linecap: round;
+  stroke-linecap: miter;
 }
 
 .centered-col {
