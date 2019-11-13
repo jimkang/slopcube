@@ -65,20 +65,20 @@ function renderEdges({
   }
 }
 
-function getEdgeSrcX({ edge }) {
-  return edge[0][0];
+function getEdgeSrcX({ coords }) {
+  return coords[0][0];
 }
 
-function getEdgeSrcY({ edge }) {
-  return edge[0][1];
+function getEdgeSrcY({ coords }) {
+  return coords[0][1];
 }
 
-function getEdgeDestX({ edge }) {
-  return edge[1][0];
+function getEdgeDestX({ coords }) {
+  return coords[1][0];
 }
 
-function getEdgeDestY({ edge }) {
-  return edge[1][1];
+function getEdgeDestY({ coords }) {
+  return coords[1][1];
 }
 
 module.exports = renderEdges;
