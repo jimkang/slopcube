@@ -57,9 +57,11 @@ function slopFlow({ random }) {
     cubeLines.radialLines[2],
     cubeLines.cyclicLines[3]
   ]);
-  var contourLines = flatten(radialLine0ContourLines
-    .concat(radialLine2ContourLines)
-    .concat(radialLine4ContourLines));
+  var contourLines = flatten(
+    radialLine0ContourLines
+      .concat(radialLine2ContourLines)
+      .concat(radialLine4ContourLines)
+  );
 
   var activeLinearGradientIds = uniq(
     cubeLines.radialLines
@@ -96,8 +98,8 @@ function slopFlow({ random }) {
   });
 
   function getHexagon() {
-    var center:Spot = { pt: [50, 50], color: getRandomColor() };
-    var edgeVertices:Array<Spot> = [];
+    var center: Spot = { pt: [50, 50], color: getRandomColor() };
+    var edgeVertices: Array<Spot> = [];
     var sliceAngles = range(3).map(getSliceAngle);
     sliceAngles = sliceAngles.concat(
       sliceAngles.map(getComplementOfSliceAngle)
@@ -112,7 +114,7 @@ function slopFlow({ random }) {
       const y = radialLineLengths[i] * Math.sin(angle);
       edgeVertices.push({
         pt: [center.pt[0] + x, center.pt[1] + y],
-        color: getRandomColor(),
+        color: getRandomColor()
       });
     }
     return { center, edgeVertices };
@@ -133,7 +135,7 @@ function slopFlow({ random }) {
     return base + base * proportionalVariance;
   }
 
-  function getContourLines(edgeTrio:[Line, Line, Line]) {
+  function getContourLines(edgeTrio: [Line, Line, Line]) {
     const contourPtsPerLine = probable.roll(contourDivisionsPerLine - 1) + 1;
 
     // We need to make the edges go in the same direction.
@@ -150,7 +152,9 @@ function slopFlow({ random }) {
       edge: lastLine
     });
 
-    var contourPointsGroups:Array<Array<Spot>> = edgeTrio.map(getContourPointsAlongLine);
+    var contourPointsGroups: Array<Array<Spot>> = edgeTrio.map(
+      getContourPointsAlongLine
+    );
     return [
       makeLinesBetweenPointGroups({
         ptGroupA: contourPointsGroups[0],
@@ -164,9 +168,9 @@ function slopFlow({ random }) {
       })
     ];
 
-    function getContourPointsAlongLine(line:Line) {
+    function getContourPointsAlongLine(line: Line) {
       var { coords, ptA, ptB } = line;
-      var pts:Array<Spot> = [];
+      var pts: Array<Spot> = [];
       var contourIndexes = probable
         .sample(range(contourDivisionsPerLine), contourPtsPerLine)
         .sort();
@@ -186,18 +190,26 @@ function slopFlow({ random }) {
       return pts;
     }
 
-    function makeLinesBetweenPointGroups({ ptGroupA, ptGroupB, edgeIds }: { ptGroupA: Array<Spot>, ptGroupB: Array<Spot>, edgeIds: [string, string] }) {
+    function makeLinesBetweenPointGroups({
+      ptGroupA,
+      ptGroupB,
+      edgeIds
+    }: {
+      ptGroupA: Array<Spot>;
+      ptGroupB: Array<Spot>;
+      edgeIds: [string, string];
+    }) {
       if (ptGroupA.length !== ptGroupB.length) {
         throw new Error(
           `makeLinesBetweenPointGroups was given point groups of different sizes: ${ptGroupA.length} and ${ptGroupB.length}.`
         );
       }
-      var edges:Array<Line> = [];
+      var edges: Array<Line> = [];
 
       for (var i = 0; i < ptGroupA.length; ++i) {
         const idBase = `contour-SRC-${edgeIds[0]}-DEST-${edgeIds[1]}`;
-        let ptA:Spot = ptGroupA[i];
-        let ptB:Spot = ptGroupB[i];
+        let ptA: Spot = ptGroupA[i];
+        let ptB: Spot = ptGroupB[i];
         edges.push({
           id: `${idBase}-indexes-${ptA.contourIndex}-${ptB.contourIndex}`,
           coords: [copyPt(ptA.pt), copyPt(ptB.pt)],
@@ -211,7 +223,7 @@ function slopFlow({ random }) {
   }
 
   function getCubeLines({ center, edgeVertices }) {
-    var radialLines:Array<Line> = [];
+    var radialLines: Array<Line> = [];
     for (var i = 0; i < edgeVertices.length; i += 2) {
       radialLines.push({
         id: `radial-edge-${i}`,
@@ -224,7 +236,7 @@ function slopFlow({ random }) {
     return { radialLines, cyclicLines };
   }
 
-  function makeLineToPrev(point, i, points):Line {
+  function makeLineToPrev(point, i, points): Line {
     var prevIndex;
     if (i === 0) {
       prevIndex = points.length - 1;
@@ -274,11 +286,17 @@ function getComplementOfSliceAngle(angle) {
   return baseSliceAngle - variance;
 }
 
-function getLineDirection(line:Line):[number, number] {
+function getLineDirection(line: Line): [number, number] {
   return [line.ptB[0] - line.ptA[0], line.ptB[1] - line.ptA[1]];
 }
 
-function matchDirection({ direction, edge }: { direction: [number, number], edge: Line }):Line {
+function matchDirection({
+  direction,
+  edge
+}: {
+  direction: [number, number];
+  edge: Line;
+}): Line {
   var edgeDirection = getLineDirection(edge);
   var reverseDirection = edgeDirection.map(invert);
   var normalCosSim = math.cosSim(edgeDirection, direction);

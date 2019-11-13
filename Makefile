@@ -23,6 +23,7 @@ build:
 
 prettier:
 	prettier --single-quote --write "**/*.js"
+	prettier --single-quote --write "**/*.ts"
 
 sync:
 	rsync -a $(HOMEDIR)/ $(USER)@$(SERVER):/$(APPDIR) --exclude node_modules/ \
