@@ -1,6 +1,6 @@
 body {
-  font-size: 30px;
-  font-family: mr-eaves-sans, sans-serif;
+  font-size: 24px;
+  font-family: Ubuntu, roboto, noto, segoe ui, arial, -apple-system, BlinkMacSystemFont, avenir next, avenir, helvetica neue, helvetica, sans-serif;
   color: #666;
   background-color: #fff;
   margin-bottom: 2em;
@@ -11,7 +11,7 @@ body {
 }
 
 .dark {
-  color: #888;
+  color: #eee;
   background-color: black;
   transition: 3s background-color;
 }
@@ -74,21 +74,22 @@ p {
 }
 
 button {
-  text-transform: uppercase;
-  color: #444;
+  /*! text-transform: uppercase; */
+  color: #fff;
   font-size: 1em;
   cursor: pointer;
-  background-color: white;
+  background-color: #111;
   padding-top: 0.5em;
   border-radius: 1.2em;
-  border-width: 1px;
-  border-color: #aaa;
+  border-width: 2px;
+  border-color: #fff;
   border-style: solid;
   min-width: 44px;
   /*! box-shadow: #444 0 0 4px; */
   padding-bottom: 0.5em;
   padding-left: 1em;
   padding-right: 1em;
+  margin-bottom: 1em;
 }
 
 .click-target {
@@ -130,10 +131,10 @@ button {
 }
 
 @keyframes rainbow-dimmer {
-  0% { stroke: hsla(120.00, 75%, 60.00%, 0.8) }
-  25% { stroke: hsla(166.92, 75%, 61.37%, 0.8) }
-  50% { stroke: hsla(189.88, 75%, 70.00%, 0.8) }
-  75% { stroke: hsla(192.47, 75%, 70.00%, 0.8) }
+  0% { border-color: hsla(120.00, 75%, 60.00%, 0.8) }
+  25% { border-color: hsla(166.92, 75%, 61.37%, 0.8) }
+  50% { border-color: hsla(189.88, 75%, 70.00%, 0.8) }
+  75% { border-color: hsla(192.47, 75%, 70.00%, 0.8) }
 }
 
 .rainbow-stop-0 {
@@ -248,6 +249,15 @@ footer {
 
 .debug #debug-layer {
   display: initial;
+}
+
+#cube-statement {
+  animation: rainbow-dimmer 10s infinite;
+  border-width: 2px;
+  border-style: solid;
+  padding: 1em;
+  margin-top: 1em;
+  border-radius: 0.5em;
 }
 
 @media all and (max-height: 568px) {
