@@ -252,7 +252,8 @@ footer {
 }
 
 #cube-statement {
-  animation: rainbow-dimmer 10s infinite;
+  /* animation: rainbow-dimmer 10s infinite; */
+  border-color: #eee;
   border-width: 2px;
   border-style: solid;
   padding: 1em;
