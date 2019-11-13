@@ -1,12 +1,13 @@
-export interface HSLColor {
+export interface HCLColor {
   h: number;
-  s: number;
+  c: number;
   l: number;
+  opacity: number;
 }
 
 export interface Spot {
   pt: [number, number];
-  color: HSLColor;
+  color: HCLColor;
   contourIndex?: number;
 }
 
