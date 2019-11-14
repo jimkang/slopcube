@@ -20,18 +20,18 @@ function renderShiftingLayouts({
   layouts.forEach(curry(renderLayout)(probable));
 }
 
-function renderLayout(probable, { hexagonVertices, cubeLines, contourLines }) {
+function renderLayout(probable, { hexagon, cubeLines, contourLines }) {
   renderPoints({
-    points: hexagonVertices.edgeVertices.map(v => v.pt),
+    points: hexagon.edgeVertices.map(v => v.pt),
     className: 'hexagon-vertex',
     rootSelector: '#debug-layer .hexagon-points',
     colorAccessor: v => v.color
   });
   renderPoints({
-    points: [hexagonVertices.center.pt],
+    points: [hexagon.center.pt],
     className: 'hexagon-center',
     rootSelector: '#debug-layer .hexagon-points',
-    colorAccessor: hexagonVertices.center.color
+    colorAccessor: hexagon.center.color
   });
 
   var activeLinearGradients = cubeLines.radialLines
@@ -48,14 +48,14 @@ function renderLayout(probable, { hexagonVertices, cubeLines, contourLines }) {
     lines: cubeLines.radialLines,
     className: 'radial-edge',
     rootSelector: '#edge-layer .cube-edges',
-    center: hexagonVertices.center,
+    center: hexagon.center,
     colorAccessor: getColor
   });
   renderLines({
     lines: cubeLines.cyclicLines,
     className: 'cyclic-edge',
     rootSelector: '#edge-layer .cube-edges',
-    center: hexagonVertices.center,
+    center: hexagon.center,
     colorAccessor: getColor
   });
   renderLines({
@@ -63,7 +63,7 @@ function renderLayout(probable, { hexagonVertices, cubeLines, contourLines }) {
     className: 'contour-edge',
     rootSelector: '#edge-layer .contour-edges',
     probable,
-    center: hexagonVertices.center,
+    center: hexagon.center,
     colorAccessor: getColor
   });
 }

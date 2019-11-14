@@ -4,7 +4,8 @@ var { hclColorToRGBString } = require('../linear-gradient');
 var interpolateHCL = require('../interpolate-hcl');
 var hclColorToD3 = require('../hcl-color-to-d3');
 
-const endPointColorShiftDuration = '15s';
+const endPointColorShiftDuration = '8s';
+const midStopMoveDuration = '10s';
 
 var defs = d3.select('defs');
 const cubicEaseValues =
@@ -31,7 +32,7 @@ function renderLinearGradientDefs(defObjects) {
     .append('animate')
     .attr('attributeName', 'offset')
     .attr('values', cubicEaseValues)
-    .attr('dur', '15s')
+    .attr('dur', midStopMoveDuration)
     .attr('repeatCount', 'indefinite');
   newGradientDefs
     .append('stop')

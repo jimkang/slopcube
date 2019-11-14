@@ -1,10 +1,8 @@
 var { range } = require('d3-array');
 var renderShiftingLayouts = require('../dom/render-shifting-layouts');
-var math = require('basic-2d-math');
 var { Tablenest, d } = require('tablenest');
 var Probable = require('probable').createProbable;
-var flatten = require('lodash.flatten');
-var interpolateHCL = require('../interpolate-hcl');
+var makeLayout = require('../make-layout');
 
 import { HCLColor, Spot, Line, copyPt, Layout } from '../types';
 
@@ -22,8 +20,28 @@ function slopFlow({ random }) {
   var rollDivisions = tablenest(divisionsTableDef);
   let contourDivisionsPerLine = rollDivisions();
 
-  var layoutA: Layout = getLayout();
+  var hexagonA = getHexagon();
+  var numberOfContoursOnEachParallelTrio = range(3).map(
+    () => probable.roll(contourDivisionsPerLine - 1) + 1
+  );
+  var contourIndexesOnEachParallelTrio: Array<
+    Array<number>
+  > = numberOfContoursOnEachParallelTrio.map(getContourIndexesForTrio);
+
+  var layoutA: Layout = makeLayout({
+    hexagon: hexagonA,
+    contourIndexesOnEachParallelTrio,
+    contourDivisionsPerLine
+  });
+  //var layoutB: Layout = wobbleLayout({ layout: layoutA, probable });^
+
   renderShiftingLayouts({ layouts: [layoutA], probable });
+
+  function getContourIndexesForTrio(numberOfContours: number): Array<number> {
+    return probable
+      .sample(range(contourDivisionsPerLine), numberOfContours)
+      .sort();
+  }
 
   function getHexagon() {
     var center: Spot = { pt: [50, 50], color: getRandomColor() };
@@ -63,127 +81,6 @@ function slopFlow({ random }) {
     return base + base * proportionalVariance;
   }
 
-  function getContourLines(edgeTrio: [Line, Line, Line]) {
-    const contourPtsPerLine = probable.roll(contourDivisionsPerLine - 1) + 1;
-
-    // We need to make the edges go in the same direction.
-    var centerLine = edgeTrio[1];
-    var edgeDirection = getLineDirection(centerLine);
-    var firstLine = edgeTrio[0];
-    var lastLine = edgeTrio[2];
-    firstLine = matchDirection({
-      direction: edgeDirection,
-      edge: firstLine
-    });
-    lastLine = matchDirection({
-      direction: edgeDirection,
-      edge: lastLine
-    });
-
-    var contourPointsGroups: Array<Array<Spot>> = edgeTrio.map(
-      getContourPointsAlongLine
-    );
-    return [
-      makeLinesBetweenPointGroups({
-        ptGroupA: contourPointsGroups[0],
-        ptGroupB: contourPointsGroups[1],
-        edgeIds: [firstLine.id, centerLine.id]
-      }),
-      makeLinesBetweenPointGroups({
-        ptGroupA: contourPointsGroups[1],
-        ptGroupB: contourPointsGroups[2],
-        edgeIds: [centerLine.id, lastLine.id]
-      })
-    ];
-
-    function getContourPointsAlongLine(line: Line) {
-      var { coords, ptA, ptB } = line;
-      var pts: Array<Spot> = [];
-      var contourIndexes = probable
-        .sample(range(contourDivisionsPerLine), contourPtsPerLine)
-        .sort();
-      const yDelta = coords[1][1] - coords[0][1];
-      const xDelta = coords[1][0] - coords[0][0];
-      for (var i = 0; i < contourIndexes.length; ++i) {
-        const contourIndex = contourIndexes[i];
-        const coordsProportion = contourIndex / contourDivisionsPerLine;
-        const ptX = coords[0][0] + xDelta * coordsProportion;
-        const ptY = coords[0][1] + yDelta * coordsProportion;
-        pts.push({
-          contourIndex,
-          pt: [ptX, ptY],
-          color: getColorBetweenPoints({
-            proportion: coordsProportion,
-            ptA,
-            ptB
-          })
-        });
-      }
-      return pts;
-    }
-
-    function makeLinesBetweenPointGroups({
-      ptGroupA,
-      ptGroupB,
-      edgeIds
-    }: {
-      ptGroupA: Array<Spot>;
-      ptGroupB: Array<Spot>;
-      edgeIds: [string, string];
-    }) {
-      if (ptGroupA.length !== ptGroupB.length) {
-        throw new Error(
-          `makeLinesBetweenPointGroups was given point groups of different sizes: ${ptGroupA.length} and ${ptGroupB.length}.`
-        );
-      }
-      var edges: Array<Line> = [];
-
-      for (var i = 0; i < ptGroupA.length; ++i) {
-        const idBase = `contour-SRC-${edgeIds[0]}-DEST-${edgeIds[1]}`;
-        let ptA: Spot = ptGroupA[i];
-        let ptB: Spot = ptGroupB[i];
-        edges.push({
-          id: `${idBase}-indexes-${ptA.contourIndex}-${ptB.contourIndex}`,
-          coords: [copyPt(ptA.pt), copyPt(ptB.pt)],
-          ptA,
-          ptB
-        });
-      }
-
-      return edges;
-    }
-  }
-
-  function getCubeLines({ center, edgeVertices }) {
-    var radialLines: Array<Line> = [];
-    for (var i = 0; i < edgeVertices.length; i += 2) {
-      radialLines.push({
-        id: `radial-edge-${i}`,
-        coords: [center.pt.slice(), edgeVertices[i].pt.slice()],
-        ptA: center,
-        ptB: edgeVertices[i]
-      });
-    }
-    var cyclicLines = edgeVertices.map(makeLineToPrev);
-    return { radialLines, cyclicLines };
-  }
-
-  function makeLineToPrev(point, i, points): Line {
-    var prevIndex;
-    if (i === 0) {
-      prevIndex = points.length - 1;
-    } else {
-      prevIndex = i - 1;
-    }
-    var prev = points[prevIndex];
-    return {
-      id: `cyclic-edge-${prevIndex}-to-${i}`,
-      coords: [prev.pt.slice(), point.pt.slice()],
-      ptA: prev,
-      ptB: point
-    };
-  }
-
   // Sort by distance from center.
   /*
   function comparePts(a, b) {
@@ -206,76 +103,11 @@ function slopFlow({ random }) {
       opacity: 1.0
     };
   }
-
-  function getLayout(): Layout {
-    var hexagonVertices = getHexagon();
-    var cubeLines = getCubeLines(hexagonVertices);
-
-    var radialLine0ContourLines = getContourLines([
-      cubeLines.cyclicLines[2],
-      cubeLines.radialLines[0],
-      cubeLines.cyclicLines[5]
-    ]);
-    var radialLine2ContourLines = getContourLines([
-      cubeLines.cyclicLines[1],
-      cubeLines.radialLines[1],
-      cubeLines.cyclicLines[4]
-    ]);
-    var radialLine4ContourLines = getContourLines([
-      cubeLines.cyclicLines[0],
-      cubeLines.radialLines[2],
-      cubeLines.cyclicLines[3]
-    ]);
-    var contourLines = flatten(
-      radialLine0ContourLines
-        .concat(radialLine2ContourLines)
-        .concat(radialLine4ContourLines)
-    );
-    return { hexagonVertices, cubeLines, contourLines };
-  }
 }
 
 function getComplementOfSliceAngle(angle) {
   const variance = angle - baseSliceAngle;
   return baseSliceAngle - variance;
-}
-
-function getLineDirection(line: Line): [number, number] {
-  return [line.ptB[0] - line.ptA[0], line.ptB[1] - line.ptA[1]];
-}
-
-function matchDirection({
-  direction,
-  edge
-}: {
-  direction: [number, number];
-  edge: Line;
-}): Line {
-  var edgeDirection = getLineDirection(edge);
-  var reverseDirection = edgeDirection.map(invert);
-  var normalCosSim = math.cosSim(edgeDirection, direction);
-  var revCosSim = math.cosSim(reverseDirection, direction);
-  if (normalCosSim < revCosSim) {
-    edge.coords = [edge.coords[1], edge.coords[0]];
-  }
-  return edge;
-}
-
-function invert(x) {
-  return x * -1;
-}
-
-function getColorBetweenPoints({
-  ptA,
-  ptB,
-  proportion
-}: {
-  ptA: Spot;
-  ptB: Spot;
-  proportion: number;
-}) {
-  var color = interpolateHCL(ptA.color, ptB.color)(proportion);
-  return color;
 }
 
 module.exports = slopFlow;
