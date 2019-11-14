@@ -26,6 +26,8 @@ export interface LinearGradient {
   y2: string;
   beginColor: HCLColor;
   endColor: HCLColor;
+  beginColorAnimValues: string;
+  endColorAnimValues: string;
 }
 
 /*

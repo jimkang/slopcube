@@ -11,7 +11,6 @@ var {
 var renderLinearGradientDefs = require('../dom/render-linear-gradient-defs');
 var flatten = require('lodash.flatten');
 var interpolateHCL = require('../interpolate-hcl');
-var { hsl } = require('d3-color');
 
 import { HCLColor, Spot, Line, copyPt } from '../types';
 
@@ -19,7 +18,7 @@ const baseSliceAngle = (2 * Math.PI) / 6;
 const baseRadialLineLength = 35;
 
 var divisionsTableDef = {
-  root: [[10, d`d2+3`], [3, d`d20+5`], [2, d`d100+20`], [1, d`d200+100`]]
+  root: [[10, d`d3+2`], [3, d`d20+5`], [2, d`d100+20`], [1, d`d200+100`]]
 };
 
 function slopFlow({ random }) {

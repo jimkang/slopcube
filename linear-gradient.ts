@@ -1,7 +1,10 @@
 import { LinearGradient, Spot, HCLColor } from './types';
-var { formatHsl, hcl } = require('d3-color');
+var hclColorToD3 = require('./hcl-color-to-d3');
+var interpolateHCL = require('./interpolate-hcl');
 
 var allDotsRegex = /\./g;
+
+const animHueShift = 40;
 
 function getLinearGradientObject({
   ptA,
@@ -20,7 +23,9 @@ function getLinearGradientObject({
     y1: aIsGreaterVertically ? '100%' : '0%',
     y2: aIsGreaterVertically ? '0%' : '100%',
     beginColor: ptA.color,
-    endColor: ptB.color
+    endColor: ptB.color,
+    beginColorAnimValues: getAnimationValuesforColor(ptA.color),
+    endColorAnimValues: getAnimationValuesforColor(ptB.color)
   };
 }
 
@@ -31,13 +36,44 @@ function getLinearGradientId({ ptA, ptB }: { ptA: Spot; ptB: Spot }) {
   );
 }
 
-function parseHCLColorToRGBString(color: HCLColor) {
-  var hclColor = hcl(color.h, color.c, color.l, color.opacity);
+function hclColorToRGBString(color: HCLColor) {
+  var hclColor = hclColorToD3(color);
   return hclColor.formatRgb(); // formatHsl gives you negative percentages sometimes?!
+}
+
+function getAnimationValuesforColor(color: HCLColor) {
+  var redder: HCLColor = {
+    h: (color.h - animHueShift) % 360,
+    c: color.c,
+    l: color.l,
+    opacity: color.opacity
+  };
+  var slightlyRedder: HCLColor = interpolateHCL(color, redder)(0.5);
+  var bluer: HCLColor = {
+    h: (color.h + animHueShift) % 360,
+    c: color.c,
+    l: color.l,
+    opacity: color.opacity
+  };
+  var slightlyBluer: HCLColor = interpolateHCL(color, bluer)(0.5);
+
+  return [
+    color,
+    slightlyBluer,
+    bluer,
+    slightlyBluer,
+    color,
+    slightlyRedder,
+    redder,
+    slightlyRedder,
+    color
+  ]
+    .map(hclColorToRGBString)
+    .join(';');
 }
 
 module.exports = {
   getLinearGradientObject,
-  parseHCLColorToRGBString,
+  hclColorToRGBString,
   getLinearGradientId
 };
