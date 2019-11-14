@@ -3,11 +3,14 @@ var renderShiftingLayouts = require('../dom/render-shifting-layouts');
 var { Tablenest, d } = require('tablenest');
 var Probable = require('probable').createProbable;
 var makeLayout = require('../make-layout');
+var curry = require('lodash.curry');
+var RenderLines = require('../dom/render-lines');
 
 import { HCLColor, Spot, Line, copyPt, Layout } from '../types';
 
 const baseSliceAngle = (2 * Math.PI) / 6;
 const baseRadialLineLength = 35;
+const spotWobbleFactor = 0.1;
 
 var divisionsTableDef = {
   root: [[10, d`d3+2`], [3, d`d20+5`], [2, d`d100+20`], [1, d`d200+100`]]
@@ -16,11 +19,18 @@ var divisionsTableDef = {
 function slopFlow({ random }) {
   var probable = Probable({ random });
   var tablenest = Tablenest({ random });
+  var renderLines = RenderLines({ probable });
 
   var rollDivisions = tablenest(divisionsTableDef);
   let contourDivisionsPerLine = rollDivisions();
 
   var hexagonA = getHexagon();
+  var hexagonB = {
+    center: hexagonA.center,
+    edgeVertices: hexagonA.edgeVertices.map(wobbleSpot)
+  };
+  console.log('hexagons', hexagonA, hexagonB);
+
   var numberOfContoursOnEachParallelTrio = range(3).map(
     () => probable.roll(contourDivisionsPerLine - 1) + 1
   );
@@ -33,9 +43,14 @@ function slopFlow({ random }) {
     contourIndexesOnEachParallelTrio,
     contourDivisionsPerLine
   });
-  //var layoutB: Layout = wobbleLayout({ layout: layoutA, probable });^
 
-  renderShiftingLayouts({ layouts: [layoutA], probable });
+  var layoutB: Layout = makeLayout({
+    hexagon: hexagonB,
+    contourIndexesOnEachParallelTrio,
+    contourDivisionsPerLine
+  });
+
+  renderShiftingLayouts({ layouts: [layoutA, layoutB], renderLines });
 
   function getContourIndexesForTrio(numberOfContours: number): Array<number> {
     return probable
@@ -67,18 +82,28 @@ function slopFlow({ random }) {
   }
 
   function getSliceAngle() {
-    return getVariantValue(baseSliceAngle, [-0.5, 0.5]);
+    return getVariantValue([-0.5, 0.5], baseSliceAngle);
   }
 
   function getRadialLineLength() {
-    return getVariantValue(baseRadialLineLength, [-0.5, 0.5]);
+    return getVariantValue([-0.5, 0.5], baseRadialLineLength);
   }
 
-  function getVariantValue(base, proportionRange) {
+  function getVariantValue(proportionRange, base) {
     const proportionalVariance =
       proportionRange[0] +
       (probable.roll(100) / 100) * (proportionRange[1] - proportionRange[0]);
     return base + base * proportionalVariance;
+  }
+
+  function wobbleSpot(spot: Spot) {
+    return {
+      pt: spot.pt.map(
+        curry(getVariantValue)([-spotWobbleFactor, spotWobbleFactor])
+      ),
+      color: spot.color,
+      contourIndex: spot.contourIndex
+    };
   }
 
   // Sort by distance from center.

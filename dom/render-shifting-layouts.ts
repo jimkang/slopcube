@@ -1,26 +1,48 @@
 var curry = require('lodash.curry');
 var renderPoints = require('./render-points');
-var renderLines = require('./render-lines');
 var {
   getLinearGradientObject,
   getLinearGradientId
 } = require('../linear-gradient');
 var renderLinearGradientDefs = require('../dom/render-linear-gradient-defs');
+var Interval = require('d3-timer').interval;
+
+var timer;
 
 import { Layout } from '../types';
 
 function renderShiftingLayouts({
   layouts,
-  probable
+  shiftPeriod = 2000,
+  renderLines
 }: {
   layouts: Array<Layout>;
   probable: object;
+  shiftPeriod: number;
+  renderLines: object;
 }) {
-  // timer todo
-  layouts.forEach(curry(renderLayout)(probable));
+  var layoutIndex = 0;
+
+  if (timer) {
+    timer.stop();
+  }
+
+  timer = Interval(renderNextLayout, shiftPeriod);
+
+  function renderNextLayout() {
+    renderLayout(renderLines, shiftPeriod, layouts[layoutIndex]);
+    layoutIndex += 1;
+    if (layoutIndex >= layouts.length) {
+      layoutIndex = 0;
+    }
+  }
 }
 
-function renderLayout(probable, { hexagon, cubeLines, contourLines }) {
+function renderLayout(
+  renderLines,
+  tweenLengthMS,
+  { hexagon, cubeLines, contourLines }
+) {
   renderPoints({
     points: hexagon.edgeVertices.map(v => v.pt),
     className: 'hexagon-vertex',
@@ -49,22 +71,24 @@ function renderLayout(probable, { hexagon, cubeLines, contourLines }) {
     className: 'radial-edge',
     rootSelector: '#edge-layer .cube-edges',
     center: hexagon.center,
-    colorAccessor: getColor
+    colorAccessor: getColor,
+    tweenLengthMS
   });
   renderLines({
     lines: cubeLines.cyclicLines,
     className: 'cyclic-edge',
     rootSelector: '#edge-layer .cube-edges',
     center: hexagon.center,
-    colorAccessor: getColor
+    colorAccessor: getColor,
+    tweenLengthMS
   });
   renderLines({
     lines: contourLines,
     className: 'contour-edge',
     rootSelector: '#edge-layer .contour-edges',
-    probable,
     center: hexagon.center,
-    colorAccessor: getColor
+    colorAccessor: getColor,
+    tweenLengthMS
   });
 }
 
