@@ -45,3 +45,9 @@ undefined
 export function copyPt(pt): [number, number] {
   return [pt[0], pt[1]];
 }
+
+export interface Layout {
+  hexagonVertices: { center: Spot; edgeVertices: Array<Spot> };
+  cubeLines: { radialLines: Array<Line>; cyclicLines: Array<Line> };
+  contourLines: Array<Line>;
+}

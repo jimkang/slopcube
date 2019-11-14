@@ -1,18 +1,12 @@
 var { range } = require('d3-array');
-var renderPoints = require('../dom/render-points');
-var renderLines = require('../dom/render-edges');
+var renderShiftingLayouts = require('../dom/render-shifting-layouts');
 var math = require('basic-2d-math');
 var { Tablenest, d } = require('tablenest');
 var Probable = require('probable').createProbable;
-var {
-  getLinearGradientObject,
-  getLinearGradientId
-} = require('../linear-gradient');
-var renderLinearGradientDefs = require('../dom/render-linear-gradient-defs');
 var flatten = require('lodash.flatten');
 var interpolateHCL = require('../interpolate-hcl');
 
-import { HCLColor, Spot, Line, copyPt } from '../types';
+import { HCLColor, Spot, Line, copyPt, Layout } from '../types';
 
 const baseSliceAngle = (2 * Math.PI) / 6;
 const baseRadialLineLength = 35;
@@ -27,78 +21,9 @@ function slopFlow({ random }) {
 
   var rollDivisions = tablenest(divisionsTableDef);
   let contourDivisionsPerLine = rollDivisions();
-  console.log('contourDivisionsPerLine', contourDivisionsPerLine);
 
-  var hexagonVertices = getHexagon();
-
-  renderPoints({
-    points: hexagonVertices.edgeVertices.map(v => v.pt),
-    className: 'hexagon-vertex',
-    rootSelector: '#debug-layer .hexagon-points',
-    colorAccessor: v => v.color
-  });
-  renderPoints({
-    points: [hexagonVertices.center.pt],
-    className: 'hexagon-center',
-    rootSelector: '#debug-layer .hexagon-points',
-    colorAccessor: hexagonVertices.center.color
-  });
-
-  var cubeLines = getCubeLines(hexagonVertices);
-
-  var radialLine0ContourLines = getContourLines([
-    cubeLines.cyclicLines[2],
-    cubeLines.radialLines[0],
-    cubeLines.cyclicLines[5]
-  ]);
-  var radialLine2ContourLines = getContourLines([
-    cubeLines.cyclicLines[1],
-    cubeLines.radialLines[1],
-    cubeLines.cyclicLines[4]
-  ]);
-  var radialLine4ContourLines = getContourLines([
-    cubeLines.cyclicLines[0],
-    cubeLines.radialLines[2],
-    cubeLines.cyclicLines[3]
-  ]);
-  var contourLines = flatten(
-    radialLine0ContourLines
-      .concat(radialLine2ContourLines)
-      .concat(radialLine4ContourLines)
-  );
-
-  var activeLinearGradients = cubeLines.radialLines
-    .concat(cubeLines.cyclicLines)
-    .concat(contourLines)
-    .map(getLinearGradientObject)
-    .reduce(lgObjectIsUnique, []);
-
-  // The linear gradient defs referenced by the edges
-  // must exist before they are referenced.
-  renderLinearGradientDefs(activeLinearGradients);
-
-  renderLines({
-    edges: cubeLines.radialLines,
-    className: 'radial-edge',
-    rootSelector: '#edge-layer .cube-edges',
-    center: hexagonVertices.center,
-    colorAccessor: getColor
-  });
-  renderLines({
-    edges: cubeLines.cyclicLines,
-    className: 'cyclic-edge',
-    rootSelector: '#edge-layer .cube-edges',
-    center: hexagonVertices.center,
-    colorAccessor: getColor
-  });
-  renderLines({
-    edges: contourLines,
-    className: 'contour-edge',
-    rootSelector: '#edge-layer .contour-edges',
-    probable,
-    center: hexagonVertices.center,
-    colorAccessor: getColor
-  });
+  var layoutA: Layout = getLayout();
+  renderShiftingLayouts({ layouts: [layoutA], probable });
 
   function getHexagon() {
     var center: Spot = { pt: [50, 50], color: getRandomColor() };
@@ -272,12 +197,6 @@ function slopFlow({ random }) {
   }
   */
 
-  // TODO: Make this a mode
-  function getColor({ id, edge, ptA, ptB }) {
-    //return `hsl(${ptA.color.h}, ${ptA.color.s}%, ${ptA.color.l}%)`;
-    return `url('#${getLinearGradientId({ ptA, ptB })}')`;
-  }
-
   // TODO: Some kinda scheme.
   function getRandomColor(): HCLColor {
     return {
@@ -286,6 +205,33 @@ function slopFlow({ random }) {
       l: probable.roll(70) + 30,
       opacity: 1.0
     };
+  }
+
+  function getLayout(): Layout {
+    var hexagonVertices = getHexagon();
+    var cubeLines = getCubeLines(hexagonVertices);
+
+    var radialLine0ContourLines = getContourLines([
+      cubeLines.cyclicLines[2],
+      cubeLines.radialLines[0],
+      cubeLines.cyclicLines[5]
+    ]);
+    var radialLine2ContourLines = getContourLines([
+      cubeLines.cyclicLines[1],
+      cubeLines.radialLines[1],
+      cubeLines.cyclicLines[4]
+    ]);
+    var radialLine4ContourLines = getContourLines([
+      cubeLines.cyclicLines[0],
+      cubeLines.radialLines[2],
+      cubeLines.cyclicLines[3]
+    ]);
+    var contourLines = flatten(
+      radialLine0ContourLines
+        .concat(radialLine2ContourLines)
+        .concat(radialLine4ContourLines)
+    );
+    return { hexagonVertices, cubeLines, contourLines };
   }
 }
 
@@ -330,17 +276,6 @@ function getColorBetweenPoints({
 }) {
   var color = interpolateHCL(ptA.color, ptB.color)(proportion);
   return color;
-}
-
-function lgObjectIsUnique(collected, lg) {
-  if (!collected.find(matchesId)) {
-    collected.push(lg);
-  }
-  return collected;
-
-  function matchesId(collectedLg) {
-    return collectedLg.id === lg.id;
-  }
 }
 
 module.exports = slopFlow;
