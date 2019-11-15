@@ -41,7 +41,7 @@ var scaleTable = [
   [1, 'interpolateYlGnBu'],
   [1, 'interpolateYlOrBr'],
   [1, 'interpolateYlOrRd'],
-  [0, 'random']
+  [8, 'random']
 ];
 
 function GetSchemeColor(probable) {
