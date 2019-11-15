@@ -7,11 +7,11 @@ var curry = require('lodash.curry');
 var RenderLines = require('../dom/render-lines');
 var GetSchemeColor = require('../get-scheme-color');
 
-import { HCL, HCLColor, Spot, Line, copyPt, Layout } from '../types';
+import { HCL, HCLColor, Spot, Line, copyPt, Layout, Hexagon } from '../types';
 
 const baseSliceAngle = (2 * Math.PI) / 6;
 const baseRadialLineLength = 35;
-const spotWobbleFactor = 0.1;
+const spotWobbleFactor = 0.07;
 
 var divisionsTableDef = {
   root: [[10, d`d3+2`], [3, d`d20+5`], [2, d`d100+20`], [1, d`d200+100`]]
@@ -28,11 +28,6 @@ function slopFlow({ random }) {
   let contourDivisionsPerLine = rollDivisions();
 
   var hexagonA = getHexagon();
-  var hexagonB = {
-    center: hexagonA.center,
-    edgeVertices: hexagonA.edgeVertices.map(wobbleSpot)
-  };
-  console.log('hexagons', hexagonA, hexagonB);
 
   var numberOfContoursOnEachParallelTrio = range(3).map(
     () => probable.roll(contourDivisionsPerLine - 1) + 1
@@ -47,13 +42,21 @@ function slopFlow({ random }) {
     contourDivisionsPerLine
   });
 
-  var layoutB: Layout = makeLayout({
-    hexagon: hexagonB,
-    contourIndexesOnEachParallelTrio,
-    contourDivisionsPerLine
-  });
+  const numberOfExtraLayouts = probable.rollDie(20);
+  var layouts: Array<Layout> = [layoutA];
 
-  renderShiftingLayouts({ layouts: [layoutA, layoutB], renderLines });
+  for (var i = 0; i < numberOfExtraLayouts; ++i) {
+    layouts.push(
+      wobbleLayout({
+        baseHexagon: hexagonA,
+        contourIndexesOnEachParallelTrio,
+        contourDivisionsPerLine
+      })
+    );
+  }
+  console.log('layout count', layouts.length);
+
+  renderShiftingLayouts({ layouts, renderLines });
 
   function getContourIndexesForTrio(numberOfContours: number): Array<number> {
     return probable
@@ -111,6 +114,26 @@ function slopFlow({ random }) {
       color: spot.color,
       contourIndex: spot.contourIndex
     };
+  }
+
+  function wobbleLayout({
+    baseHexagon,
+    contourIndexesOnEachParallelTrio,
+    contourDivisionsPerLine
+  }: {
+    baseHexagon: Hexagon;
+    contourIndexesOnEachParallelTrio: Array<Array<number>>;
+    contourDivisionsPerLine: number;
+  }) {
+    var hexagonB = {
+      center: baseHexagon.center,
+      edgeVertices: baseHexagon.edgeVertices.map(wobbleSpot)
+    };
+    return makeLayout({
+      hexagon: hexagonB,
+      contourIndexesOnEachParallelTrio,
+      contourDivisionsPerLine
+    });
   }
 
   // Sort by distance from center.
