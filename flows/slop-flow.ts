@@ -5,6 +5,7 @@ var Probable = require('probable').createProbable;
 var makeLayout = require('../make-layout');
 var curry = require('lodash.curry');
 var RenderLines = require('../dom/render-lines');
+var GetSchemeColor = require('../get-scheme-color');
 
 import { HCL, HCLColor, Spot, Line, copyPt, Layout } from '../types';
 
@@ -20,6 +21,8 @@ function slopFlow({ random }) {
   var probable = Probable({ random });
   var tablenest = Tablenest({ random });
   var renderLines = RenderLines({ probable });
+
+  var getSchemeColor = GetSchemeColor(probable);
 
   var rollDivisions = tablenest(divisionsTableDef);
   let contourDivisionsPerLine = rollDivisions();
@@ -59,7 +62,11 @@ function slopFlow({ random }) {
   }
 
   function getHexagon() {
-    var center: Spot = { pt: [50, 50], color: getRandomColor() };
+    var colorIndexes = probable.shuffle(range(7));
+    var center: Spot = {
+      pt: [50, 50],
+      color: getSchemeColor(colorIndexes[6] / 7)
+    };
     var edgeVertices: Array<Spot> = [];
     var sliceAngles = range(3).map(getSliceAngle);
     sliceAngles = sliceAngles.concat(
@@ -75,7 +82,7 @@ function slopFlow({ random }) {
       const y = radialLineLengths[i] * Math.sin(angle);
       edgeVertices.push({
         pt: [center.pt[0] + x, center.pt[1] + y],
-        color: getRandomColor()
+        color: getSchemeColor(colorIndexes[i] / 7)
       });
     }
     return { center, edgeVertices };
@@ -118,16 +125,6 @@ function slopFlow({ random }) {
     return 1;
   }
   */
-
-  // TODO: Some kinda scheme.
-  function getRandomColor(): HCLColor {
-    return HCL(
-      probable.roll(360),
-      probable.roll(100),
-      probable.roll(70) + 30,
-      1.0
-    );
-  }
 }
 
 function getComplementOfSliceAngle(angle) {
