@@ -1,10 +1,12 @@
-import { LinearGradient, Spot, HCLColor } from './types';
+import { LinearGradient, Spot, HCLColor, HCL } from './types';
 var hclColorToD3 = require('./hcl-color-to-d3');
 var interpolateHCL = require('./interpolate-hcl');
 
 var allDotsRegex = /\./g;
 
 const animHueShift = 40;
+
+var animValuesCache = {};
 
 function getLinearGradientObject({
   ptA,
@@ -42,22 +44,28 @@ function hclColorToRGBString(color: HCLColor) {
 }
 
 function getAnimationValuesforColor(color: HCLColor) {
-  var redder: HCLColor = {
-    h: (color.h - animHueShift) % 360,
-    c: color.c,
-    l: color.l,
-    opacity: color.opacity
-  };
+  var valuesString = animValuesCache[color.rgbString];
+  if (valuesString) {
+    //console.log('cache hit!');
+    return valuesString;
+  }
+
+  var redder: HCLColor = HCL(
+    (color.h - animHueShift) % 360,
+    color.c,
+    color.l,
+    color.opacity
+  );
   var slightlyRedder: HCLColor = interpolateHCL(color, redder)(0.5);
-  var bluer: HCLColor = {
-    h: (color.h + animHueShift) % 360,
-    c: color.c,
-    l: color.l,
-    opacity: color.opacity
-  };
+  var bluer: HCLColor = HCL(
+    (color.h + animHueShift) % 360,
+    color.c,
+    color.l,
+    color.opacity
+  );
   var slightlyBluer: HCLColor = interpolateHCL(color, bluer)(0.5);
 
-  return [
+  valuesString = [
     color,
     slightlyBluer,
     bluer,
@@ -70,6 +78,9 @@ function getAnimationValuesforColor(color: HCLColor) {
   ]
     .map(hclColorToRGBString)
     .join(';');
+
+  animValuesCache[color.rgbString] = valuesString;
+  return valuesString;
 }
 
 module.exports = {

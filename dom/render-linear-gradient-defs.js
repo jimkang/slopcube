@@ -1,6 +1,5 @@
 var d3 = require('d3-selection');
 var accessor = require('accessor');
-var { hclColorToRGBString } = require('../linear-gradient');
 var interpolateHCL = require('../interpolate-hcl');
 var hclColorToD3 = require('../hcl-color-to-d3');
 
@@ -64,18 +63,19 @@ function renderLinearGradientDefs(defObjects) {
 }
 
 function getBeginColor({ beginColor }) {
-  return hclColorToRGBString(beginColor);
+  return beginColor.rgbString;
 }
 
 function getEndColor({ endColor }) {
-  return hclColorToRGBString(endColor);
+  return endColor.rgbString;
 }
 
 // TODO: Sometimes the middle should just be black!
 function getMiddleColor({ beginColor, endColor }) {
-  return hclColorToRGBString(
-    hclColorToD3(interpolateHCL(beginColor, endColor)(0.5)).brighter(1.0)
-  );
+  var midHCL = interpolateHCL(beginColor, endColor)(0.5);
+  return hclColorToD3(midHCL)
+    .brighter(1.0)
+    .rgb();
 }
 
 module.exports = renderLinearGradientDefs;

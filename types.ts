@@ -1,8 +1,11 @@
+var { hcl } = require('d3-color');
+
 export interface HCLColor {
   h: number;
   c: number;
   l: number;
   opacity: number;
+  rgbString: string;
 }
 
 export interface Spot {
@@ -55,4 +58,19 @@ export interface Layout {
   hexagon: Hexagon;
   cubeLines: { radialLines: Array<Line>; cyclicLines: Array<Line> };
   contourLines: Array<Line>;
+}
+
+export function getRGBString(h, c, l, opacity) {
+  var d3HCLColor = hcl(h, c, l, opacity);
+  return d3HCLColor.formatRgb(); // formatHsl gives you negative percentages sometimes?!
+}
+
+export function HCL(h, c, l, opacity): HCLColor {
+  return {
+    h,
+    c,
+    l,
+    opacity,
+    rgbString: getRGBString(h, c, l, opacity)
+  };
 }

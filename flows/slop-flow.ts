@@ -6,7 +6,7 @@ var makeLayout = require('../make-layout');
 var curry = require('lodash.curry');
 var RenderLines = require('../dom/render-lines');
 
-import { HCLColor, Spot, Line, copyPt, Layout } from '../types';
+import { HCL, HCLColor, Spot, Line, copyPt, Layout } from '../types';
 
 const baseSliceAngle = (2 * Math.PI) / 6;
 const baseRadialLineLength = 35;
@@ -121,12 +121,12 @@ function slopFlow({ random }) {
 
   // TODO: Some kinda scheme.
   function getRandomColor(): HCLColor {
-    return {
-      h: probable.roll(360),
-      c: probable.roll(100),
-      l: probable.roll(70) + 30,
-      opacity: 1.0
-    };
+    return HCL(
+      probable.roll(360),
+      probable.roll(100),
+      probable.roll(70) + 30,
+      1.0
+    );
   }
 }
 
