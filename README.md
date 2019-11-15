@@ -3,6 +3,8 @@ slopcube
 
 [Slopcube](https://jimkang.com/slopcube)
 
+![Slopcube gif](meta/slopcube.gif)
+
 Installation
 ------------
 
