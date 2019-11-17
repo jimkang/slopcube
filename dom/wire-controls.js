@@ -1,9 +1,11 @@
 var OLPE = require('one-listener-per-element');
 var { setListener } = OLPE();
 
-var autoupdateCheckbox = document.getElementById('autoupdate-checkbox');
+var manualUpdateModeCheckbox = document.getElementById(
+  'manual-update-checkbox'
+);
 
-function wireControls({ refresh, scheduleRefresh, unscheduleRefresh }) {
+function wireControls({ refresh, manualUpdateMode, routeState }) {
   setListener({
     eventName: 'click',
     listener: refresh,
@@ -11,18 +13,16 @@ function wireControls({ refresh, scheduleRefresh, unscheduleRefresh }) {
   });
   setListener({
     eventName: 'change',
-    listener: toggleSchedule,
-    element: autoupdateCheckbox
+    listener: toggleManualUpdateMode,
+    element: manualUpdateModeCheckbox
   });
 
-  toggleSchedule();
+  manualUpdateModeCheckbox.checked = manualUpdateMode;
 
-  function toggleSchedule() {
-    if (autoupdateCheckbox.checked) {
-      scheduleRefresh();
-    } else {
-      unscheduleRefresh();
-    }
+  function toggleManualUpdateMode() {
+    routeState.addToRoute({
+      manualUpdateMode: manualUpdateModeCheckbox.checked
+    });
   }
 }
 

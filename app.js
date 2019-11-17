@@ -9,7 +9,7 @@ var d3 = require('d3-selection');
 var routeState = RouteState({
   followRoute,
   windowObject: window,
-  propsToCoerceToBool: ['hideUI', 'debug']
+  propsToCoerceToBool: ['hideUI', 'debug', 'manualUpdateMode']
 });
 
 (function go() {
@@ -17,13 +17,19 @@ var routeState = RouteState({
   routeState.routeFromHash();
 })();
 
-function followRoute({ seed, hideUI, debug }) {
+function followRoute({ seed, hideUI, debug, manualUpdateMode }) {
   var refreshScheduler = RefreshScheduler({ refresh: seedWithDate });
   wireControls({
     refresh: seedWithDate,
-    scheduleRefresh: refreshScheduler.schedule,
-    unscheduleRefresh: refreshScheduler.unschedule
+    manualUpdateMode,
+    routeState
   });
+
+  if (manualUpdateMode) {
+    refreshScheduler.unschedule();
+  } else {
+    refreshScheduler.schedule();
+  }
 
   d3.select(document.body).classed('hide-ui', hideUI);
   d3.select(document.body).classed('debug', debug);
