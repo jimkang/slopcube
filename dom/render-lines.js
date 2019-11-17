@@ -48,12 +48,12 @@ function RenderLines({ probable }) {
       var prefix = parts.slice(0, -2).join('-');
       var existingLines = d3.selectAll(`[id^="${prefix}"]`).data();
       if (existingLines.length < 1) {
-        console.log('No near edge for prefix', prefix);
+        //console.log('No near edge for prefix', prefix, 'center', center);
         copyLineSel
-          .attr('x1', center[0])
-          .attr('y1', center[1])
-          .attr('x2', center[0])
-          .attr('y2', center[1]);
+          .attr('x1', center.pt[0])
+          .attr('y1', center.pt[1])
+          .attr('x2', center.pt[0])
+          .attr('y2', center.pt[1]);
         return;
       }
 
