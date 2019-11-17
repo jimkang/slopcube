@@ -10,7 +10,7 @@ var GetSchemeColor = require('../get-scheme-color');
 import { HCL, HCLColor, Spot, Line, copyPt, Layout, Hexagon } from '../types';
 
 const baseSliceAngle = (2 * Math.PI) / 6;
-const baseRadialLineLength = 35;
+const baseRadialLineLength = 30;
 const spotWobbleFactor = 0.07;
 
 var divisionsTableDef = {
@@ -54,7 +54,7 @@ function slopFlow({ random }) {
       })
     );
   }
-  console.log('layout count', layouts.length);
+  //console.log('layout count', layouts.length);
 
   renderShiftingLayouts({ layouts, renderLines });
 

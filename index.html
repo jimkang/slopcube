@@ -7,32 +7,41 @@
   </head>
   <body class="dark">
     <pre id="status-message" class="hidden ui"></pre>
-    <div class="ui">Spend some time with Slop Cube.</div>
 
-    <section id="slop-cubes" class="centered-col">
-      <svg width="90vmin" height="90vmin" viewBox="0 0 100 100" id="board">
-        <defs></defs>
-        <g id="debug-layer">
-          <g class="hexagon-points"></g>
-        </g>
+    <section class="overlays-container centered-col">
+      <section id="slop-cubes" class="centered-col">
+        <svg width="125vmin" height="125vmin" viewBox="0 0 100 100" id="board">
+          <defs></defs>
+          <g id="debug-layer">
+            <g class="hexagon-points"></g>
+          </g>
 
-        <g id="edge-layer">
-          <g class="cube-edges"></g>
-          <g class="contour-edges"></g>
-        </g>
-      </svg>
-
-      <section class="controls ui">
-        <div>
-          <button id="refresh-button">Change</button>
-        </div>
-        <div>
-          <input type="checkbox" id="manual-update-checkbox" name="manual-update" />
-          <label for="manual-update">Change cubes only manually</label>
-        </div>
+          <g id="edge-layer">
+            <g class="cube-edges"></g>
+            <g class="contour-edges"></g>
+          </g>
+        </svg>
       </section>
 
-      <section id="cube-statement">Think about this: What is cube?</section>
+      <section id="ui-overlay" class="ui">
+        <div class="ui">Spend some time with Slop Cube.</div>
+        <div id="cube-space" style="height: 90vmin"></div>
+        <section id="cube-statement">Think about this: What is cube?</section>
+
+        <section class="controls ui">
+          <div>
+            <button id="refresh-button">Change</button>
+          </div>
+          <div>
+            <input
+              type="checkbox"
+              id="manual-update-checkbox"
+              name="manual-update"
+            />
+            <label for="manual-update">Change cubes only manually</label>
+          </div>
+        </section>
+      </section>
     </section>
 
     <footer class="ui"></footer>
