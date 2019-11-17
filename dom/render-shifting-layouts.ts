@@ -27,6 +27,7 @@ function renderShiftingLayouts({
     timer.stop();
   }
 
+  renderNextLayout();
   timer = Interval(renderNextLayout, shiftPeriod);
 
   function renderNextLayout() {
