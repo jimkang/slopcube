@@ -1,9 +1,9 @@
 slopcube
 ==================
 
-[Slopcube](https://jimkang.com/slopcube)
+[Slop Cube](https://jimkang.com/slopcube)
 
-![Slopcube gif](meta/slopcube.gif)
+![Slop Cube gif](meta/slop-cube4.gif)
 
 Installation
 ------------
